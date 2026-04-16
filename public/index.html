@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Google Photos Cleaner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f0f0f; color: #e5e5e5; font-family: 'Inter', sans-serif; padding: 20px; }
+    .container { max-width: 800px; margin: 0 auto; }
+    h1 { font-size: 2rem; color: #4ade80; text-align: center; margin: 30px 0 8px; }
+    .subtitle { text-align: center; color: #888; margin-bottom: 30px; }
+    .warning { background: #2d1414; border: 1px solid #ef4444; border-radius: 10px; padding: 16px 20px; margin-bottom: 30px; color: #fca5a5; }
+    .warning strong { color: #ef4444; }
+    .warning a { color: #f87171; }
+    .step { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+    .step-number { color: #4ade80; font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; }
+    .step h2 { font-size: 1.1rem; margin-bottom: 10px; }
+    .step p { color: #aaa; font-size: 0.95rem; line-height: 1.6; }
+    .btn { display: inline-block; background: #4ade80; color: #0f0f0f; font-weight: 600; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.9rem; margin-top: 12px; text-decoration: none; transition: background 0.2s; }
+    .btn:hover { background: #22c55e; }
+    .code-block { position: relative; background: #0d1117; border: 1px solid #2a2a2a; border-radius: 8px; padding: 16px; margin-top: 14px; overflow-x: auto; }
+    .code-block pre { font-family: monospace; font-size: 0.8rem; color: #7ee787; white-space: pre-wrap; }
+    .copy-btn { position: absolute; top: 10px; right: 10px; background: #238636; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: background 0.2s; }
+    .copy-btn:hover { background: #2ea043; }
+    .tips { background: #1a1f2e; border: 1px solid #2a3a5a; border-radius: 10px; padding: 20px; margin-top: 10px; }
+    .tips h3 { color: #60a5fa; margin-bottom: 12px; }
+    .tips ul { list-style: none; padding: 0; }
+    .tips ul li { color: #94a3b8; font-size: 0.9rem; padding: 5px 0 5px 20px; position: relative; }
+    .tips ul li::before { content: "->"; position: absolute; left: 0; color: #4ade80; }
+    .footer { text-align: center; color: #555; font-size: 0.8rem; margin-top: 40px; padding-bottom: 30px; }
+    kbd { background: #2a2a2a; border: 1px solid #444; border-radius: 4px; padding: 2px 7px; font-size: 0.85rem; font-family: monospace; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Google Photos Cleaner</h1>
+  <p class="subtitle">Elimina masivamente tus fotos y videos de Google Fotos</p>
+
+  <div class="warning">
+    <strong>Advertencia:</strong> Las fotos eliminadas no se pueden recuperar despues de vaciar la papelera.
+    Antes de continuar, haz un respaldo en <a href="https://takeout.google.com" target="_blank">Google Takeout</a>.
+  </div>
+
+  <div class="step">
+    <div class="step-number">PASO 1</div>
+    <h2>Abre Google Fotos en una nueva pestana</h2>
+    <p>Asegurate de estar con la cuenta de la que quieres eliminar las fotos.</p>
+    <a class="btn" href="https://photos.google.com" target="_blank">Abrir Google Fotos</a>
+  </div>
+
+  <div class="step">
+    <div class="step-number">PASO 2</div>
+    <h2>Abre la consola del navegador</h2>
+    <p>
+      En <strong>Chrome o Edge:</strong> presiona <kbd>F12</kbd> y luego click en la pestana <strong>Console</strong><br/><br/>
+      En <strong>Mac:</strong> presiona <kbd>Cmd</kbd> + <kbd>Option</kbd> + <kbd>J</kbd><br/><br/>
+      En <strong>Firefox:</strong> presiona <kbd>F12</kbd> y click en <strong>Consola</strong>
+    </p>
+  </div>
+
+  <div class="step">
+    <div class="step-number">PASO 3</div>
+    <h2>Copia el script y pegalo en la consola</h2>
+    <p>Haz click en el boton de copiar, luego pega con <kbd>Ctrl+V</kbd> o <kbd>Cmd+V</kbd> en la consola y presiona <kbd>Enter</kbd>.</p>
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyScript()">Copiar</button>
+      <pre id="script-content">(function() {
+  async function sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+  async function run() {
+    const photos = document.querySelectorAll('div[data-latest-bg]');
+    if (!photos.length) {
+      alert('No se encontraron fotos. Asegurate de estar en photos.google.com');
+      return;
+    }
+    photos[0].dispatchEvent(new MouseEvent('mouseover', {bubbles: true}));
+    await sleep(300);
+    photos[0].click();
+    await sleep(300);
+    photos.forEach(p => p.click());
+    await sleep(500);
+    const moreBtn = document.querySelector('button[aria-label="More options"]') ||
+                    document.querySelector('button[aria-label="Mas opciones"]');
+    if (moreBtn) moreBtn.click();
+    await sleep(500);
+    const deleteBtn = Array.from(document.querySelectorAll('li[role="menuitem"]'))
+      .find(el => el.textContent.includes('Delete') ||
+                  el.textContent.includes('Eliminar') ||
+                  el.textContent.includes('papelera'));
+    if (deleteBtn) {
+      deleteBtn.click();
+      await sleep(500);
+      const confirmBtn = document.querySelector('button[data-mdc-dialog-action="ok"]') ||
+        Array.from(document.querySelectorAll('button'))
+          .find(b => b.textContent.includes('Move to trash') ||
+                     b.textContent.includes('Mover a la papelera'));
+      if (confirmBtn) {
+        confirmBtn.click();
+        await sleep(1000);
+        alert('Lote movido a la papelera. Recarga Google Fotos con F5 y ejecuta el script de nuevo.');
+      } else {
+        alert('No se encontro el boton de confirmar. Intentalo de nuevo.');
+      }
+    } else {
+      alert('No se encontro el boton de eliminar. Intentalo de nuevo.');
+    }
+  }
+  run();
+})();</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-number">PASO 4</div>
+    <h2>Repite hasta eliminar todo</h2>
+    <p>El script mueve un lote a la papelera cada vez. Recarga Google Fotos con <kbd>F5</kbd> y vuelve a ejecutar el script hasta que no queden fotos.</p>
+  </div>
+
+  <div class="tips">
+    <h3>Informacion importante</h3>
+    <ul>
+      <li>Las fotos van a la papelera, no se eliminan de inmediato</li>
+      <li>Tienes 60 dias para recuperarlas desde la papelera</li>
+      <li>Para eliminar definitivamente: ve a Papelera y haz click en "Vaciar papelera"</li>
+      <li>Si tienes miles de fotos, necesitaras ejecutar el script varias veces</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    Esta herramienta funciona completamente en tu navegador. Ningun dato es enviado a ningun servidor.
+  </div>
+</div>
+
+<script>
+  function copyScript() {
+    const text = document.getElementById('script-content').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.innerText = 'Copiado!';
+      btn.style.background = '#4ade80';
+      btn.style.color = '#0f0f0f';
+      setTimeout(() => {
+        btn.innerText = 'Copiar';
+        btn.style.background = '#238636';
+        btn.style.color = '#fff';
+      }, 2000);
+    });
+  }
+</script>
+</body>
+</html>
