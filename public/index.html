@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Google Photos Cleaner</title>
+  <meta name="description" content="Herramienta gratuita para eliminar masivamente fotos y videos de Google Fotos usando la consola del navegador">
+  <meta property="og:title" content="Google Photos Cleaner">
+  <meta property="og:description" content="Herramienta gratuita para eliminar masivamente fotos y videos de Google Fotos usando la consola del navegador">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧹</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,6 +33,11 @@
     .tips ul { list-style: none; padding: 0; }
     .tips ul li { color: #94a3b8; font-size: 0.9rem; padding: 5px 0 5px 20px; position: relative; }
     .tips ul li::before { content: "->"; position: absolute; left: 0; color: #4ade80; }
+    .faq { margin-top: 40px; }
+    .faq h2 { text-align: center; color: #4ade80; margin-bottom: 20px; }
+    .faq-item { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+    .faq-item h3 { font-size: 1rem; color: #e5e5e5; margin-bottom: 8px; }
+    .faq-item p { color: #aaa; font-size: 0.9rem; line-height: 1.5; }
     .footer { text-align: center; color: #555; font-size: 0.8rem; margin-top: 40px; padding-bottom: 30px; }
     kbd { background: #2a2a2a; border: 1px solid #444; border-radius: 4px; padding: 2px 7px; font-size: 0.85rem; font-family: monospace; }
   </style>
@@ -39,14 +48,14 @@
   <p class="subtitle">Elimina masivamente tus fotos y videos de Google Fotos</p>
 
   <div class="warning">
-    <strong>Advertencia:</strong> Las fotos eliminadas no se pueden recuperar despues de vaciar la papelera.
+    <strong>Advertencia:</strong> Las fotos eliminadas no se pueden recuperar después de vaciar la papelera.
     Antes de continuar, haz un respaldo en <a href="https://takeout.google.com" target="_blank">Google Takeout</a>.
   </div>
 
   <div class="step">
     <div class="step-number">PASO 1</div>
-    <h2>Abre Google Fotos en una nueva pestana</h2>
-    <p>Asegurate de estar con la cuenta de la que quieres eliminar las fotos.</p>
+    <h2>Abre Google Fotos en una nueva pestaña</h2>
+    <p>Asegúrate de estar con la cuenta de la que quieres eliminar las fotos.</p>
     <a class="btn" href="https://photos.google.com" target="_blank">Abrir Google Fotos</a>
   </div>
 
@@ -54,7 +63,7 @@
     <div class="step-number">PASO 2</div>
     <h2>Abre la consola del navegador</h2>
     <p>
-      En <strong>Chrome o Edge:</strong> presiona <kbd>F12</kbd> y luego click en la pestana <strong>Console</strong><br/><br/>
+      En <strong>Chrome o Edge:</strong> presiona <kbd>F12</kbd> y luego click en la pestaña <strong>Console</strong><br/><br/>
       En <strong>Mac:</strong> presiona <kbd>Cmd</kbd> + <kbd>Option</kbd> + <kbd>J</kbd><br/><br/>
       En <strong>Firefox:</strong> presiona <kbd>F12</kbd> y click en <strong>Consola</strong>
     </p>
@@ -62,52 +71,104 @@
 
   <div class="step">
     <div class="step-number">PASO 3</div>
-    <h2>Copia el script y pegalo en la consola</h2>
-    <p>Haz click en el boton de copiar, luego pega con <kbd>Ctrl+V</kbd> o <kbd>Cmd+V</kbd> en la consola y presiona <kbd>Enter</kbd>.</p>
+    <h2>Copia el script y pégalo en la consola</h2>
+    <p>Haz click en el botón de copiar, luego pega con <kbd>Ctrl+V</kbd> o <kbd>Cmd+V</kbd> en la consola y presiona <kbd>Enter</kbd>.</p>
+    
+    <div style="margin-top: 20px; padding: 15px; background: #222; border-radius: 8px; border: 1px dashed #444;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <span style="font-weight: 600;">Modo Automático</span>
+        <button id="auto-toggle" class="btn" style="margin-top: 0; padding: 5px 15px; background: #333; color: #fff; border: 1px solid #555;">OFF</button>
+      </div>
+      <div id="batch-counter" style="font-size: 0.85rem; color: #4ade80; display: none;">
+        Lotes eliminados: <span id="batch-count">0</span>
+      </div>
+    </div>
+
     <div class="code-block">
       <button class="copy-btn" onclick="copyScript()">Copiar</button>
       <pre id="script-content">(function() {
+  // CONFIGURACIÓN DE AUTO-LOOP
+  const AUTO_LOOP = __AUTO_MODE_PLACEHOLDER__; 
+
   async function sleep(ms) {
     return new Promise(r => setTimeout(r, ms));
   }
+
   async function run() {
-    const photos = document.querySelectorAll('div[data-latest-bg]');
+    // Selectores múltiples para robustez
+    const selectors = ['div[data-latest-bg]', 'div[jsmodel]', 'c-wiz div[role="checkbox"]'];
+    let photos = [];
+    
+    for (const selector of selectors) {
+      photos = document.querySelectorAll(selector);
+      if (photos.length > 0) break;
+    }
+
     if (!photos.length) {
-      alert('No se encontraron fotos. Asegurate de estar en photos.google.com');
+      console.error('No se encontraron fotos. Asegúrate de estar en photos.google.com');
       return;
     }
+
+    console.log(`Seleccionando ${photos.length} fotos...`);
+    
+    // Iniciar selección
     photos[0].dispatchEvent(new MouseEvent('mouseover', {bubbles: true}));
-    await sleep(300);
+    await sleep(500);
     photos[0].click();
-    await sleep(300);
-    photos.forEach(p => p.click());
     await sleep(500);
+
+    // Seleccionar el resto
+    photos.forEach((p, i) => {
+      if (i > 0) p.click();
+    });
+
+    console.log('Fotos seleccionadas. Procediendo a eliminar...');
+    await sleep(2000); // Retraso de 2 segundos para evitar rate limiting
+
     const moreBtn = document.querySelector('button[aria-label="More options"]') ||
-                    document.querySelector('button[aria-label="Mas opciones"]');
+                    document.querySelector('button[aria-label="Más opciones"]');
     if (moreBtn) moreBtn.click();
-    await sleep(500);
+    await sleep(1000);
+
     const deleteBtn = Array.from(document.querySelectorAll('li[role="menuitem"]'))
       .find(el => el.textContent.includes('Delete') ||
                   el.textContent.includes('Eliminar') ||
                   el.textContent.includes('papelera'));
+
     if (deleteBtn) {
       deleteBtn.click();
-      await sleep(500);
+      await sleep(1000);
+
       const confirmBtn = document.querySelector('button[data-mdc-dialog-action="ok"]') ||
         Array.from(document.querySelectorAll('button'))
           .find(b => b.textContent.includes('Move to trash') ||
                      b.textContent.includes('Mover a la papelera'));
+
       if (confirmBtn) {
         confirmBtn.click();
-        await sleep(1000);
-        alert('Lote movido a la papelera. Recarga Google Fotos con F5 y ejecuta el script de nuevo.');
+        
+        // Incrementar contador de lotes en sessionStorage
+        let batchCount = parseInt(sessionStorage.getItem('gpc_batches') || '0') + 1;
+        sessionStorage.setItem('gpc_batches', batchCount);
+        console.log(`Lotes eliminados: ${batchCount}`);
+
+        await sleep(2000); // Esperar a que se procese la eliminación
+
+        if (AUTO_LOOP) {
+          console.log('Modo automático activo. Recargando en 3 segundos...');
+          await sleep(3000);
+          location.reload();
+        } else {
+          alert(`Lote de ${photos.length} fotos movido a la papelera.\nLotes eliminados en esta sesión: ${batchCount}\nRecarga Google Fotos con F5 para continuar.`);
+        }
       } else {
-        alert('No se encontro el boton de confirmar. Intentalo de nuevo.');
+        console.error('No se encontró el botón de confirmar.');
       }
     } else {
-      alert('No se encontro el boton de eliminar. Intentalo de nuevo.');
+      console.error('No se encontró el botón de eliminar.');
     }
   }
+
   run();
 })();</pre>
     </div>
@@ -120,34 +181,108 @@
   </div>
 
   <div class="tips">
-    <h3>Informacion importante</h3>
+    <h3>Información importante</h3>
     <ul>
       <li>Las fotos van a la papelera, no se eliminan de inmediato</li>
-      <li>Tienes 60 dias para recuperarlas desde la papelera</li>
+      <li>Tienes 60 días para recuperarlas desde la papelera</li>
       <li>Para eliminar definitivamente: ve a Papelera y haz click en "Vaciar papelera"</li>
-      <li>Si tienes miles de fotos, necesitaras ejecutar el script varias veces</li>
+      <li>Si tienes miles de fotos, necesitarás ejecutar el script varias veces</li>
     </ul>
   </div>
 
+  <div class="faq">
+    <h2>Preguntas Frecuentes</h2>
+    <div class="faq-item">
+      <h3>¿Es seguro usar esta herramienta?</h3>
+      <p>Sí, es totalmente seguro. El script se ejecuta localmente en tu navegador y no tiene acceso a tus credenciales. Solo automatiza los clics que tú harías manualmente.</p>
+    </div>
+    <div class="faq-item">
+      <h3>¿Funciona en móvil?</h3>
+      <p>No, esta herramienta requiere acceso a la consola de desarrollador del navegador, la cual solo está disponible en navegadores de escritorio (Chrome, Firefox, Edge, Safari).</p>
+    </div>
+    <div class="faq-item">
+      <h3>¿Puedo recuperar las fotos después?</h3>
+      <p>Sí, las fotos se mueven a la papelera de Google Fotos, donde permanecen por 60 días antes de ser eliminadas permanentemente, a menos que vacíes la papelera manualmente.</p>
+    </div>
+    <div class="faq-item">
+      <h3>¿Por qué tengo que ejecutar el script varias veces?</h3>
+      <p>Google Fotos solo carga una cantidad limitada de fotos a la vez en el navegador. El script selecciona lo que es visible en pantalla para asegurar que la eliminación sea exitosa sin bloquear tu cuenta.</p>
+    </div>
+  </div>
+
   <div class="footer">
-    Esta herramienta funciona completamente en tu navegador. Ningun dato es enviado a ningun servidor.
+    Esta herramienta funciona completamente en tu navegador. Ningún dato es enviado a ningún servidor.
   </div>
 </div>
 
 <script>
+  let autoMode = false;
+  const autoToggle = document.getElementById('auto-toggle');
+  const batchCounter = document.getElementById('batch-counter');
+  const batchCountSpan = document.getElementById('batch-count');
+
+  // Inicializar contador si existe en sessionStorage
+  const savedBatches = sessionStorage.getItem('gpc_batches');
+  if (savedBatches && savedBatches !== '0') {
+    batchCounter.style.display = 'block';
+    batchCountSpan.innerText = savedBatches;
+  }
+
+  autoToggle.addEventListener('click', () => {
+    autoMode = !autoMode;
+    autoToggle.innerText = autoMode ? 'ON' : 'OFF';
+    autoToggle.style.background = autoMode ? '#4ade80' : '#333';
+    autoToggle.style.color = autoMode ? '#0f0f0f' : '#fff';
+    autoToggle.style.borderColor = autoMode ? '#4ade80' : '#555';
+  });
+
+  function getScriptContent() {
+    let content = document.getElementById('script-content').innerText;
+    return content.replace('__AUTO_MODE_PLACEHOLDER__', autoMode.toString());
+  }
+
   function copyScript() {
-    const text = document.getElementById('script-content').innerText;
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = document.querySelector('.copy-btn');
-      btn.innerText = 'Copiado!';
-      btn.style.background = '#4ade80';
-      btn.style.color = '#0f0f0f';
-      setTimeout(() => {
-        btn.innerText = 'Copiar';
-        btn.style.background = '#238636';
-        btn.style.color = '#fff';
-      }, 2000);
-    });
+    const text = getScriptContent();
+    
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(() => {
+        updateBtn();
+      }).catch(err => {
+        fallbackCopy(text);
+      });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-9999px";
+    textArea.style.top = "0";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      updateBtn();
+    } catch (err) {
+      console.error('Error al copiar:', err);
+    }
+    document.body.removeChild(textArea);
+  }
+
+  function updateBtn() {
+    const btn = document.querySelector('.copy-btn');
+    btn.innerText = '¡Copiado!';
+    btn.style.background = '#4ade80';
+    btn.style.color = '#0f0f0f';
+    setTimeout(() => {
+      btn.innerText = 'Copiar';
+      btn.style.background = '#238636';
+      btn.style.color = '#fff';
+    }, 2000);
   }
 </script>
 </body>
