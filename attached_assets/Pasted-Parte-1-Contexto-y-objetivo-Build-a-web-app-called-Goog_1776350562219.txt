@@ -1,0 +1,101 @@
+Parte 1 — Contexto y objetivo
+Build a web app called "Google Photos Cleaner" that helps users bulk delete all their photos and videos from Google Photos using a JavaScript script injected into the browser console.
+
+The app must be deployable on Render as a Node.js + Express static server.
+
+Parte 2 — Stack técnico
+Tech stack:
+- Backend: Node.js + Express (only to serve static files)
+- Frontend: Single HTML file with vanilla JavaScript and CSS
+- No database needed
+- No authentication needed
+- Must have a package.json with a "start" script: "node server.js"
+
+Parte 3 — Estructura del proyecto
+Project structure:
+/google-photos-cleaner
+  ├── server.js
+  ├── package.json
+  └── public/
+        └── index.html
+
+Parte 4 — Funcionalidad
+The app must have these sections:
+
+1. HEADER: App name + short description
+
+2. WARNING BANNER: Red alert box warning the user that deleted photos cannot be recovered and to back up first using Google Takeout (link: https://takeout.google.com)
+
+3. STEP BY STEP GUIDE with 4 steps:
+   Step 1: "Open Google Photos in a new tab" — with a button that opens https://photos.google.com in a new tab
+   Step 2: "Open the browser Developer Console" — explain how to open it on Chrome/Firefox/Safari with keyboard shortcuts (F12 or Cmd+Option+J)
+   Step 3: "Copy the script below" — show the script in a styled code block with a "Copy Script" button that copies it to clipboard and changes to "Copied ✓"
+   Step 4: "Paste and press Enter in the console" — explain to paste with Ctrl+V or Cmd+V and press Enter, then wait
+
+4. THE SCRIPT BLOCK must contain this exact JavaScript:
+(function() {
+  let deleted = 0;
+  function selectAll() {
+    const checkboxes = document.querySelectorAll('div[data-latest-bg]');
+    checkboxes.forEach(el => el.click());
+  }
+  async function deleteSelected() {
+    const moreBtn = document.querySelector('button[aria-label="More options"]') || 
+                    document.querySelector('button[aria-label="Más opciones"]');
+    if (moreBtn) moreBtn.click();
+    await new Promise(r => setTimeout(r, 500));
+    const deleteBtn = Array.from(document.querySelectorAll('li[role="menuitem"]'))
+      .find(el => el.textContent.includes('Delete') || el.textContent.includes('Eliminar') || el.textContent.includes('Mover a la papelera'));
+    if (deleteBtn) {
+      deleteBtn.click();
+      await new Promise(r => setTimeout(r, 500));
+      const confirmBtn = document.querySelector('button[data-mdc-dialog-action="ok"]') ||
+                         Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('Move to trash') || b.textContent.includes('Mover a la papelera'));
+      if (confirmBtn) { confirmBtn.click(); deleted++; }
+    }
+  }
+  async function run() {
+    const firstPhoto = document.querySelector('div[data-latest-bg]');
+    if (!firstPhoto) { alert('No photos found. Make sure you are on photos.google.com'); return; }
+    firstPhoto.dispatchEvent(new MouseEvent('mouseover', {bubbles: true}));
+    await new Promise(r => setTimeout(r, 300));
+    firstPhoto.click();
+    await new Promise(r => setTimeout(r, 300));
+    selectAll();
+    await new Promise(r => setTimeout(r, 500));
+    await deleteSelected();
+    console.log('Batch sent to trash. Refresh and run again to continue. Total batches: ' + deleted);
+    alert('Batch moved to trash ✓\nRefresh Google Photos (F5) and run the script again to continue with the next batch.');
+  }
+  run();
+})();
+
+5. PROGRESS TIPS section: A small info box explaining:
+   - The script moves photos to trash in batches
+   - The user must refresh Google Photos and run the script again for each batch
+   - After all photos are in trash, go to Trash → Empty Trash to delete permanently
+   - Photos stay in trash for 60 days if not manually emptied
+
+6. FOOTER: "This tool runs entirely in your browser. No photos or data are sent to any server."
+
+Parte 5 — Diseño
+Design requirements:
+- Dark theme (background #0f0f0f, cards #1a1a1a, accent color #4ade80 green)
+- Clean modern font (use Google Fonts: Inter)
+- Each step inside a numbered card with a subtle border
+- The code block must have a dark background (#0d1117), monospace font, horizontal scroll, and a floating "Copy" button in the top right corner
+- Fully responsive for mobile
+- Smooth hover effects on buttons
+
+Parte 6 — Deploy en Render
+Make sure:
+- server.js uses Express to serve the /public folder as static
+- The port reads from process.env.PORT || 3000
+- package.json includes: "start": "node server.js" in scripts
+- Add a render.yaml file with:
+  services:
+    - type: web
+      name: google-photos-cleaner
+      env: node
+      buildCommand: npm install
+      startCommand: npm start
