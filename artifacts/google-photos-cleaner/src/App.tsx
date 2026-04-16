@@ -37,11 +37,11 @@ const SCRIPT = `(function() {
   run();
 })();`;
 
-// ─── Icons ──────────────────────────────────────────────────────────────────
+// ─── Icons ───────────────────────────────────────────────────────────────────
 
-function IconTrash() {
+function IconTrash({ size = 20 }: { size?: number }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="3 6 5 6 21 6" />
       <path d="M19 6l-1 14H6L5 6" />
       <path d="M10 11v6M14 11v6" />
@@ -69,17 +69,17 @@ function IconCopy() {
   );
 }
 
-function IconCheck() {
+function IconCheck({ size = 14 }: { size?: number }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );
 }
 
-function IconShield() {
+function IconShield({ size = 16 }: { size?: number }) {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
     </svg>
   );
@@ -105,18 +105,53 @@ function IconAlertTriangle() {
   );
 }
 
+function IconArrowRight({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
+    </svg>
+  );
+}
+
 function IconChevronDown({ open }: { open: boolean }) {
   return (
     <svg
       width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-      style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease" }}
+      style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.22s ease" }}
     >
       <polyline points="6 9 12 15 18 9" />
     </svg>
   );
 }
 
-// ─── Animated counter ────────────────────────────────────────────────────────
+function IconZap() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </svg>
+  );
+}
+
+function IconLock() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
+
+function IconCode() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="16 18 22 12 16 6" />
+      <polyline points="8 6 2 12 8 18" />
+    </svg>
+  );
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function useInView(ref: React.RefObject<HTMLElement | null>) {
   const [inView, setInView] = useState(false);
@@ -130,6 +165,356 @@ function useInView(ref: React.RefObject<HTMLElement | null>) {
     return () => obs.disconnect();
   }, [ref]);
   return inView;
+}
+
+// ─── Landing page ─────────────────────────────────────────────────────────────
+
+const FEATURES = [
+  { icon: <IconZap />, label: "4 pasos simples", sub: "Guía clara y directa" },
+  { icon: <IconLock />, label: "100% privado", sub: "Todo ocurre en tu navegador" },
+  { icon: <IconCode />, label: "Sin instalación", sub: "Copia y pega en la consola" },
+  { icon: <IconShield size={16} />, label: "Gratis para siempre", sub: "Sin registro ni contraseñas" },
+];
+
+function LandingPage({ onEnter }: { onEnter: () => void }) {
+  const [visible, setVisible] = useState(false);
+  const [exiting, setExiting] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 60);
+    return () => clearTimeout(t);
+  }, []);
+
+  const handleEnter = () => {
+    setExiting(true);
+    setTimeout(onEnter, 520);
+  };
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#090909",
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
+        overflow: "hidden",
+        animation: exiting ? "exitUp 0.52s cubic-bezier(0.4,0,1,1) forwards" : "none",
+      }}
+    >
+      {/* ── Dot grid ──────────────────────────────────────────── */}
+      <div
+        className="dot-grid"
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+          opacity: 0.5,
+          maskImage: "radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 100%)",
+          WebkitMaskImage: "radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 100%)",
+        }}
+      />
+
+      {/* ── Orb 1 — top center green ──────────────────────────── */}
+      <div
+        style={{
+          position: "absolute",
+          top: "-180px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "700px",
+          height: "700px",
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(74,222,128,0.13) 0%, rgba(74,222,128,0.04) 40%, transparent 70%)",
+          filter: "blur(40px)",
+          animation: "floatOrb 14s ease-in-out infinite",
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── Orb 2 — bottom left teal ──────────────────────────── */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: "-120px",
+          left: "-100px",
+          width: "500px",
+          height: "500px",
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(34,211,238,0.08) 0%, transparent 65%)",
+          filter: "blur(50px)",
+          animation: "floatOrb2 18s ease-in-out infinite",
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── Orb 3 — right edge faint ──────────────────────────── */}
+      <div
+        style={{
+          position: "absolute",
+          top: "30%",
+          right: "-80px",
+          width: "360px",
+          height: "360px",
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(74,222,128,0.06) 0%, transparent 70%)",
+          filter: "blur(60px)",
+          animation: "floatOrb 22s ease-in-out infinite reverse",
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── Top nav bar ───────────────────────────────────────── */}
+      <nav
+        style={{
+          position: "relative",
+          zIndex: 10,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "20px 32px",
+          borderBottom: "1px solid rgba(255,255,255,0.05)",
+          opacity: visible ? 1 : 0,
+          transition: "opacity 0.5s ease 0.1s",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
+          <div
+            style={{
+              width: "30px",
+              height: "30px",
+              backgroundColor: "#4ade80",
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#090909",
+            }}
+          >
+            <IconTrash size={15} />
+          </div>
+          <span style={{ color: "#ffffff", fontWeight: 600, fontSize: "15px" }}>
+            Photos Cleaner
+          </span>
+        </div>
+
+        <button
+          onClick={handleEnter}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            backgroundColor: "transparent",
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: "8px",
+            padding: "8px 16px",
+            color: "#a3a3a3",
+            fontSize: "13px",
+            fontWeight: 500,
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(74,222,128,0.4)";
+            (e.currentTarget as HTMLButtonElement).style.color = "#4ade80";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.12)";
+            (e.currentTarget as HTMLButtonElement).style.color = "#a3a3a3";
+          }}
+        >
+          Ir a la herramienta
+          <IconArrowRight size={13} />
+        </button>
+      </nav>
+
+      {/* ── Hero ──────────────────────────────────────────────── */}
+      <main
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "40px 24px 60px",
+          position: "relative",
+          zIndex: 5,
+        }}
+      >
+        {/* Badge */}
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "7px",
+            backgroundColor: "rgba(74,222,128,0.08)",
+            border: "1px solid rgba(74,222,128,0.2)",
+            borderRadius: "100px",
+            padding: "6px 16px",
+            marginBottom: "28px",
+            fontSize: "12px",
+            fontWeight: 600,
+            color: "#4ade80",
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+            opacity: visible ? 1 : 0,
+            transform: visible ? "translateY(0)" : "translateY(16px)",
+            transition: "opacity 0.6s ease 0.15s, transform 0.6s cubic-bezier(0.22,1,0.36,1) 0.15s",
+          }}
+        >
+          <span style={{
+            width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#4ade80",
+            boxShadow: "0 0 8px rgba(74,222,128,0.8)",
+            display: "inline-block",
+            animation: "dotPulse 2s ease-in-out infinite",
+          }} />
+          Herramienta gratuita · Sin instalación
+        </div>
+
+        {/* H1 */}
+        <h1
+          style={{
+            fontSize: "clamp(36px, 6.5vw, 72px)",
+            fontWeight: 800,
+            lineHeight: 1.1,
+            letterSpacing: "-2px",
+            color: "#ffffff",
+            maxWidth: "780px",
+            margin: "0 0 20px",
+            opacity: visible ? 1 : 0,
+            transform: visible ? "translateY(0)" : "translateY(24px)",
+            transition: "opacity 0.65s ease 0.25s, transform 0.65s cubic-bezier(0.22,1,0.36,1) 0.25s",
+          }}
+        >
+          Limpia Google Photos{" "}
+          <span className="gradient-text" style={{ display: "inline-block" }}>
+            en minutos
+          </span>
+        </h1>
+
+        {/* Subtitle */}
+        <p
+          style={{
+            fontSize: "clamp(15px, 2vw, 18px)",
+            color: "#6b7280",
+            lineHeight: 1.7,
+            maxWidth: "520px",
+            margin: "0 0 44px",
+            opacity: visible ? 1 : 0,
+            transform: visible ? "translateY(0)" : "translateY(20px)",
+            transition: "opacity 0.65s ease 0.35s, transform 0.65s cubic-bezier(0.22,1,0.36,1) 0.35s",
+          }}
+        >
+          Elimina en masa todas tus fotos y vídeos usando un pequeño script
+          que se ejecuta directamente en la consola de tu navegador.
+          Sin instalar nada, sin compartir datos.
+        </p>
+
+        {/* CTA button */}
+        <div
+          style={{
+            opacity: visible ? 1 : 0,
+            transform: visible ? "translateY(0)" : "translateY(18px)",
+            transition: "opacity 0.65s ease 0.45s, transform 0.65s cubic-bezier(0.22,1,0.36,1) 0.45s",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "16px",
+          }}
+        >
+          <button
+            onClick={handleEnter}
+            className="btn-glow"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "10px",
+              backgroundColor: "#4ade80",
+              color: "#090909",
+              fontWeight: 700,
+              fontSize: "17px",
+              padding: "16px 36px",
+              borderRadius: "12px",
+              border: "none",
+              cursor: "pointer",
+              letterSpacing: "-0.2px",
+            }}
+          >
+            Empezar ahora
+            <IconArrowRight size={20} />
+          </button>
+
+          <p style={{ color: "#374151", fontSize: "13px" }}>
+            Sin registro · Sin contraseñas · Gratis para siempre
+          </p>
+        </div>
+      </main>
+
+      {/* ── Feature cards ─────────────────────────────────────── */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 5,
+          borderTop: "1px solid rgba(255,255,255,0.05)",
+          backgroundColor: "rgba(255,255,255,0.02)",
+          padding: "28px 24px",
+          opacity: visible ? 1 : 0,
+          transition: "opacity 0.8s ease 0.55s",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "860px",
+            margin: "0 auto",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gap: "1px",
+          }}
+        >
+          {FEATURES.map((f, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                padding: "16px 20px",
+              }}
+            >
+              <div
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  flexShrink: 0,
+                  borderRadius: "10px",
+                  backgroundColor: "rgba(74,222,128,0.09)",
+                  border: "1px solid rgba(74,222,128,0.18)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#4ade80",
+                }}
+              >
+                {f.icon}
+              </div>
+              <div>
+                <div style={{ color: "#e5e5e5", fontWeight: 600, fontSize: "14px" }}>
+                  {f.label}
+                </div>
+                <div style={{ color: "#4b5563", fontSize: "12px", marginTop: "2px" }}>
+                  {f.sub}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // ─── Copy button ─────────────────────────────────────────────────────────────
@@ -180,25 +565,64 @@ function CopyButton({ text, onCopied }: { text: string; onCopied?: () => void })
   );
 }
 
-// ─── Code block with syntax-like coloring ────────────────────────────────────
+// ─── Code block ──────────────────────────────────────────────────────────────
+
+function colorize(line: string): React.ReactNode {
+  const commentMatch = line.match(/^(.*?)(\/\/.*)$/);
+  if (commentMatch) {
+    return <>{colorizeTokens(commentMatch[1])}<span style={{ color: "#6e7681" }}>{commentMatch[2]}</span></>;
+  }
+  return colorizeTokens(line);
+}
+
+function colorizeTokens(line: string): React.ReactNode {
+  const tokens: Array<{ text: string; color?: string }> = [];
+  const patterns = [
+    { re: /\b(function|async|await|let|const|var|if|return|new|true|false|null|undefined|forEach|find|includes)\b/g, color: "#ff7b72" },
+    { re: /((['"`])(?:(?!\2)[^\\]|\\.)*\2)/g, color: "#a5d6ff" },
+    { re: /\b(\d+)\b/g, color: "#79c0ff" },
+  ];
+
+  const allMatches: Array<{ index: number; end: number; color: string; text: string }> = [];
+  for (const { re, color } of patterns) {
+    const r = new RegExp(re.source, "g");
+    let m: RegExpExecArray | null;
+    while ((m = r.exec(line)) !== null) {
+      allMatches.push({ index: m.index, end: m.index + m[0].length, color, text: m[0] });
+    }
+  }
+
+  allMatches.sort((a, b) => a.index - b.index);
+  const clean: typeof allMatches = [];
+  let cursor = 0;
+  for (const match of allMatches) {
+    if (match.index >= cursor) { clean.push(match); cursor = match.end; }
+  }
+
+  let last = 0;
+  for (const { index, end, color, text } of clean) {
+    if (index > last) tokens.push({ text: line.slice(last, index) });
+    tokens.push({ text, color });
+    last = end;
+  }
+  if (last < line.length) tokens.push({ text: line.slice(last) });
+
+  return tokens.length
+    ? <>{tokens.map((t, i) => t.color ? <span key={i} style={{ color: t.color }}>{t.text}</span> : t.text)}</>
+    : <>{line}</>;
+}
 
 function CodeBlock({ code, onCopied }: { code: string; onCopied?: () => void }) {
   const lines = code.split("\n");
-
   return (
     <div style={{ position: "relative", borderRadius: "12px", overflow: "hidden", border: "1px solid #2d2d2d" }}>
-      {/* Toolbar */}
       <div style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        backgroundColor: "#161b22",
-        borderBottom: "1px solid #21262d",
-        padding: "10px 16px",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        backgroundColor: "#161b22", borderBottom: "1px solid #21262d", padding: "10px 16px",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <div style={{ display: "flex", gap: "6px" }}>
-            {["#ff5f56", "#ffbd2e", "#27c93f"].map((c, i) => (
+            {["#ff5f56","#ffbd2e","#27c93f"].map((c, i) => (
               <div key={i} style={{ width: "12px", height: "12px", borderRadius: "50%", backgroundColor: c }} />
             ))}
           </div>
@@ -211,25 +635,17 @@ function CodeBlock({ code, onCopied }: { code: string; onCopied?: () => void }) 
           <CopyButton text={code} onCopied={onCopied} />
         </div>
       </div>
-
-      {/* Code area */}
       <div style={{ backgroundColor: "#0d1117", overflowX: "auto" }}>
         <table style={{ borderCollapse: "collapse", width: "100%", minWidth: "600px" }}>
           <tbody>
             {lines.map((line, i) => (
-              <tr key={i} style={{ lineHeight: "1.65" }}>
+              <tr key={i}>
                 <td style={{
-                  padding: "0 16px 0 16px",
-                  userSelect: "none",
-                  color: "#484f58",
-                  fontSize: "12px",
+                  padding: `${i === 0 ? "16px" : "0"} 16px ${i === lines.length - 1 ? "16px" : "0"} 16px`,
+                  userSelect: "none", color: "#484f58", fontSize: "12px",
                   fontFamily: "'Menlo','Monaco','Courier New',monospace",
-                  textAlign: "right",
-                  minWidth: "40px",
-                  borderRight: "1px solid #21262d",
-                  verticalAlign: "top",
-                  paddingTop: i === 0 ? "16px" : "0",
-                  paddingBottom: i === lines.length - 1 ? "16px" : "0",
+                  textAlign: "right", minWidth: "40px",
+                  borderRight: "1px solid #21262d", verticalAlign: "top",
                 }}>
                   {i + 1}
                 </td>
@@ -238,11 +654,9 @@ function CodeBlock({ code, onCopied }: { code: string; onCopied?: () => void }) 
                   verticalAlign: "top",
                 }}>
                   <span style={{
-                    color: "#c9d1d9",
-                    fontSize: "12.5px",
+                    color: "#c9d1d9", fontSize: "12.5px",
                     fontFamily: "'Menlo','Monaco','Courier New',monospace",
-                    whiteSpace: "pre",
-                    display: "block",
+                    whiteSpace: "pre", display: "block",
                   }}>
                     {colorize(line)}
                   </span>
@@ -256,137 +670,37 @@ function CodeBlock({ code, onCopied }: { code: string; onCopied?: () => void }) 
   );
 }
 
-function colorize(line: string): React.ReactNode {
-  // Very simple keyword coloring
-  const keywords = /\b(function|async|await|let|const|var|if|return|new|true|false|null|undefined)\b/g;
-  const strings = /((['"`])(?:(?!\2)[^\\]|\\.)*\2)/g;
-  const comments = /(\/\/.*$)/;
-  const numbers = /\b(\d+)\b/g;
-
-  if (comments.test(line)) {
-    const [pre, ...rest] = line.split("//");
-    return (
-      <>
-        {pre}
-        <span style={{ color: "#6e7681" }}>{"//" + rest.join("//")}</span>
-      </>
-    );
-  }
-
-  // Tokenize simple pattern
-  const parts: React.ReactNode[] = [];
-  let last = 0;
-  const allMatches: Array<{ index: number; end: number; type: string; text: string }> = [];
-
-  let m: RegExpExecArray | null;
-
-  const kwRe = new RegExp(keywords.source, "g");
-  while ((m = kwRe.exec(line)) !== null) {
-    allMatches.push({ index: m.index, end: m.index + m[0].length, type: "keyword", text: m[0] });
-  }
-  const strRe = new RegExp(strings.source, "g");
-  while ((m = strRe.exec(line)) !== null) {
-    allMatches.push({ index: m.index, end: m.index + m[0].length, type: "string", text: m[0] });
-  }
-  const numRe = new RegExp(numbers.source, "g");
-  while ((m = numRe.exec(line)) !== null) {
-    allMatches.push({ index: m.index, end: m.index + m[0].length, type: "number", text: m[0] });
-  }
-
-  // Sort and deduplicate overlapping ranges
-  allMatches.sort((a, b) => a.index - b.index);
-  const clean: typeof allMatches = [];
-  let cursor = 0;
-  for (const match of allMatches) {
-    if (match.index >= cursor) {
-      clean.push(match);
-      cursor = match.end;
-    }
-  }
-
-  last = 0;
-  for (const { index, end, type, text } of clean) {
-    if (index > last) parts.push(line.slice(last, index));
-    const color = type === "keyword" ? "#ff7b72" : type === "string" ? "#a5d6ff" : "#79c0ff";
-    parts.push(<span key={index} style={{ color }}>{text}</span>);
-    last = end;
-  }
-  if (last < line.length) parts.push(line.slice(last));
-
-  return parts.length ? <>{parts}</> : <>{line}</>;
-}
-
-// ─── FAQ Accordion ───────────────────────────────────────────────────────────
+// ─── FAQ ──────────────────────────────────────────────────────────────────────
 
 const faqs = [
-  {
-    q: "¿El script borra mis fotos permanentemente?",
-    a: "No. El script mueve las fotos a la papelera de Google Photos. Permanecen allí durante 60 días. Para eliminarlas permanentemente debes ir a Papelera → Vaciar papelera.",
-  },
-  {
-    q: "¿Por qué tengo que ejecutar el script varias veces?",
-    a: "Google Photos carga las fotos en grupos (lotes). El script procesa un lote cada vez. Después de cada ejecución, recarga la página (F5) y vuelve a ejecutarlo para procesar el siguiente grupo.",
-  },
-  {
-    q: "¿Funciona en todos los navegadores?",
-    a: "Sí, funciona en Chrome, Edge, Firefox y Safari. Chrome o Edge son los más recomendados por su compatibilidad con la consola de desarrollador.",
-  },
-  {
-    q: "¿El script accede a mis datos o contraseña?",
-    a: "No. El script se ejecuta únicamente en tu navegador, dentro de la pestaña de Google Photos que ya tienes abierta. No envía ningún dato a ningún servidor externo.",
-  },
-  {
-    q: "¿Qué pasa si el script dice 'No se encontraron fotos'?",
-    a: "Asegúrate de estar en la vista principal de Google Photos (photos.google.com), no en un álbum ni en la papelera. Recarga la página y vuelve a intentarlo.",
-  },
-  {
-    q: "¿Puedo recuperar las fotos después de ejecutar el script?",
-    a: "Sí, mientras no hayas vaciado la papelera. Ve a Google Photos → Papelera y selecciona las fotos que quieras restaurar.",
-  },
+  { q: "¿El script borra mis fotos permanentemente?", a: "No. El script mueve las fotos a la papelera de Google Photos. Permanecen allí durante 60 días. Para eliminarlas permanentemente debes ir a Papelera → Vaciar papelera." },
+  { q: "¿Por qué tengo que ejecutar el script varias veces?", a: "Google Photos carga las fotos en grupos (lotes). El script procesa un lote cada vez. Después de cada ejecución, recarga la página (F5) y vuelve a ejecutarlo para procesar el siguiente grupo." },
+  { q: "¿Funciona en todos los navegadores?", a: "Sí, funciona en Chrome, Edge, Firefox y Safari. Chrome o Edge son los más recomendados por su compatibilidad con la consola de desarrollador." },
+  { q: "¿El script accede a mis datos o contraseña?", a: "No. El script se ejecuta únicamente en tu navegador, dentro de la pestaña de Google Photos que ya tienes abierta. No envía ningún dato a ningún servidor externo." },
+  { q: "¿Qué pasa si el script dice 'No se encontraron fotos'?", a: "Asegúrate de estar en la vista principal de Google Photos (photos.google.com), no en un álbum ni en la papelera. Recarga la página y vuelve a intentarlo." },
+  { q: "¿Puedo recuperar las fotos después de ejecutar el script?", a: "Sí, mientras no hayas vaciado la papelera. Ve a Google Photos → Papelera y selecciona las fotos que quieras restaurar." },
 ];
 
 function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div
-      style={{
-        borderBottom: "1px solid #2a2a2a",
-      }}
-    >
+    <div style={{ borderBottom: "1px solid #2a2a2a" }}>
       <button
         onClick={() => setOpen(!open)}
         aria-expanded={open}
         style={{
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "12px",
-          backgroundColor: "transparent",
-          border: "none",
-          cursor: "pointer",
-          padding: "18px 0",
-          textAlign: "left",
-          color: "#e5e5e5",
-          fontSize: "15px",
-          fontWeight: 500,
-          fontFamily: "Inter, sans-serif",
+          width: "100%", display: "flex", alignItems: "center",
+          justifyContent: "space-between", gap: "12px",
+          backgroundColor: "transparent", border: "none", cursor: "pointer",
+          padding: "18px 0", textAlign: "left",
+          color: "#e5e5e5", fontSize: "15px", fontWeight: 500, fontFamily: "Inter, sans-serif",
         }}
       >
         <span>{q}</span>
-        <span style={{ color: "#4ade80", flexShrink: 0 }}>
-          <IconChevronDown open={open} />
-        </span>
+        <span style={{ color: "#4ade80", flexShrink: 0 }}><IconChevronDown open={open} /></span>
       </button>
       {open && (
-        <div
-          style={{
-            color: "#a3a3a3",
-            fontSize: "14px",
-            lineHeight: 1.7,
-            paddingBottom: "18px",
-          }}
-        >
+        <div style={{ color: "#a3a3a3", fontSize: "14px", lineHeight: 1.7, paddingBottom: "18px" }}>
           {a}
         </div>
       )}
@@ -396,19 +710,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 
 // ─── Step card ────────────────────────────────────────────────────────────────
 
-function StepCard({
-  num,
-  total,
-  title,
-  done,
-  children,
-}: {
-  num: number;
-  total: number;
-  title: string;
-  done?: boolean;
-  children: React.ReactNode;
-}) {
+function StepCard({ num, total, title, done, children }: { num: number; total: number; title: string; done?: boolean; children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref as React.RefObject<HTMLElement>);
   const isLast = num === total;
@@ -418,89 +720,44 @@ function StepCard({
       ref={ref}
       style={{
         display: "flex",
-        gap: "0",
         opacity: inView ? 1 : 0,
         transform: inView ? "translateY(0)" : "translateY(20px)",
         transition: `opacity 0.45s ease ${(num - 1) * 0.08}s, transform 0.45s ease ${(num - 1) * 0.08}s`,
       }}
     >
-      {/* Left rail — number + connecting line */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          flexShrink: 0,
-          width: "44px",
-          marginRight: "20px",
-        }}
-      >
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0, width: "44px", marginRight: "20px" }}>
         <div
           style={{
-            width: "38px",
-            height: "38px",
-            borderRadius: "50%",
+            width: "38px", height: "38px", borderRadius: "50%",
             backgroundColor: done ? "#4ade80" : "#1e2d1e",
-            border: `2px solid ${done ? "#4ade80" : "#4ade80"}`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            border: "2px solid #4ade80",
+            display: "flex", alignItems: "center", justifyContent: "center",
             color: done ? "#0f0f0f" : "#4ade80",
-            fontWeight: 700,
-            fontSize: "14px",
-            flexShrink: 0,
-            transition: "background-color 0.3s ease",
-            zIndex: 1,
-            position: "relative",
+            fontWeight: 700, fontSize: "14px", flexShrink: 0,
+            transition: "background-color 0.3s ease", zIndex: 1, position: "relative",
           }}
         >
           {done ? <IconCheck /> : num}
         </div>
         {!isLast && (
-          <div
-            style={{
-              flex: 1,
-              width: "2px",
-              backgroundColor: done ? "#4ade80" : "#2a2a2a",
-              marginTop: "8px",
-              minHeight: "28px",
-              transition: "background-color 0.3s ease",
-            }}
-          />
+          <div style={{
+            flex: 1, width: "2px",
+            backgroundColor: done ? "#4ade80" : "#2a2a2a",
+            marginTop: "8px", minHeight: "28px",
+            transition: "background-color 0.3s ease",
+          }} />
         )}
       </div>
 
-      {/* Card content */}
       <div
+        className="card-hover"
         style={{
-          flex: 1,
-          backgroundColor: "#1a1a1a",
-          border: "1px solid #2a2a2a",
-          borderRadius: "12px",
-          padding: "22px 24px",
+          flex: 1, backgroundColor: "#1a1a1a", border: "1px solid #2a2a2a",
+          borderRadius: "12px", padding: "22px 24px",
           marginBottom: isLast ? "0" : "16px",
-          transition: "border-color 0.2s ease, box-shadow 0.2s ease",
-        }}
-        onMouseEnter={(e) => {
-          const el = e.currentTarget as HTMLDivElement;
-          el.style.borderColor = "#3d3d3d";
-          el.style.boxShadow = "0 4px 20px rgba(0,0,0,0.4)";
-        }}
-        onMouseLeave={(e) => {
-          const el = e.currentTarget as HTMLDivElement;
-          el.style.borderColor = "#2a2a2a";
-          el.style.boxShadow = "none";
         }}
       >
-        <h3
-          style={{
-            fontSize: "16px",
-            fontWeight: 600,
-            color: "#ffffff",
-            margin: "0 0 16px",
-            lineHeight: 1.3,
-          }}
-        >
+        <h3 style={{ fontSize: "16px", fontWeight: 600, color: "#ffffff", margin: "0 0 16px", lineHeight: 1.3 }}>
           {title}
         </h3>
         {children}
@@ -509,14 +766,18 @@ function StepCard({
   );
 }
 
-// ─── Main App ─────────────────────────────────────────────────────────────────
+// ─── Tool page ────────────────────────────────────────────────────────────────
 
-export default function App() {
+function ToolPage({ onBack }: { onBack: () => void }) {
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [visible, setVisible] = useState(false);
 
-  const markDone = (step: number) =>
-    setCompletedSteps((prev) => new Set([...prev, step]));
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 20);
+    return () => clearTimeout(t);
+  }, []);
 
+  const markDone = (step: number) => setCompletedSteps((prev) => new Set([...prev, step]));
   const progress = Math.round((completedSteps.size / 4) * 100);
 
   return (
@@ -527,229 +788,126 @@ export default function App() {
         color: "#e5e5e5",
         fontFamily: "'Inter', sans-serif",
         paddingBottom: "80px",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(20px)",
+        transition: "opacity 0.6s ease 0.05s, transform 0.6s cubic-bezier(0.22,1,0.36,1) 0.05s",
       }}
     >
-      {/* ── Header ─────────────────────────────────────────────────── */}
-      <header
+      {/* Top bar */}
+      <div
         style={{
-          background: "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(74,222,128,0.08) 0%, transparent 70%), linear-gradient(180deg, #111111 0%, #0f0f0f 100%)",
           borderBottom: "1px solid #1a1a1a",
-          padding: "56px 24px 48px",
-          textAlign: "center",
-          position: "relative",
-          overflow: "hidden",
+          padding: "14px 24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          backgroundColor: "#0f0f0f",
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
+          backdropFilter: "blur(12px)",
         }}
       >
-        <div style={{ maxWidth: "680px", margin: "0 auto", position: "relative" }}>
-          {/* Badge */}
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              backgroundColor: "rgba(74,222,128,0.1)",
-              border: "1px solid rgba(74,222,128,0.25)",
-              borderRadius: "20px",
-              padding: "5px 14px",
-              marginBottom: "20px",
-              fontSize: "12px",
-              fontWeight: 600,
-              color: "#4ade80",
-              letterSpacing: "0.02em",
-            }}
-          >
-            <IconShield />
-            100% Gratis · Sin registro · Funciona en tu navegador
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{
+            width: "30px", height: "30px", backgroundColor: "#4ade80",
+            borderRadius: "8px", display: "flex", alignItems: "center",
+            justifyContent: "center", color: "#090909",
+          }}>
+            <IconTrash size={15} />
           </div>
-
-          {/* Icon + Title */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", marginBottom: "16px" }}>
-            <div
-              style={{
-                width: "44px",
-                height: "44px",
-                backgroundColor: "#4ade80",
-                borderRadius: "12px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#0f0f0f",
-                boxShadow: "0 0 24px rgba(74,222,128,0.35)",
-              }}
-            >
-              <IconTrash />
-            </div>
-            <h1
-              style={{
-                fontSize: "clamp(24px, 4vw, 32px)",
-                fontWeight: 700,
-                color: "#ffffff",
-                margin: 0,
-                letterSpacing: "-0.6px",
-              }}
-            >
-              Google Photos Cleaner
-            </h1>
-          </div>
-
-          <p
-            style={{
-              color: "#737373",
-              fontSize: "16px",
-              lineHeight: 1.65,
-              margin: "0 auto",
-              maxWidth: "500px",
-            }}
-          >
-            Elimina en masa todas tus fotos y vídeos de Google Photos usando un
-            script que se ejecuta directamente en tu navegador.
-          </p>
+          <span style={{ color: "#ffffff", fontWeight: 600, fontSize: "15px" }}>Google Photos Cleaner</span>
         </div>
-      </header>
+        <button
+          onClick={onBack}
+          style={{
+            display: "flex", alignItems: "center", gap: "6px",
+            backgroundColor: "transparent", border: "1px solid #2a2a2a",
+            borderRadius: "7px", padding: "7px 14px",
+            color: "#737373", fontSize: "13px", cursor: "pointer",
+            fontFamily: "Inter, sans-serif", transition: "all 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = "#4a4a4a";
+            (e.currentTarget as HTMLButtonElement).style.color = "#a3a3a3";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = "#2a2a2a";
+            (e.currentTarget as HTMLButtonElement).style.color = "#737373";
+          }}
+        >
+          ← Portada
+        </button>
+      </div>
 
       <div style={{ maxWidth: "720px", margin: "0 auto", padding: "0 20px" }}>
 
-        {/* ── Progress bar ───────────────────────────────────────────── */}
+        {/* Progress */}
         {completedSteps.size > 0 && (
-          <div
-            style={{
-              marginTop: "28px",
-              backgroundColor: "#1a1a1a",
-              border: "1px solid #2a2a2a",
-              borderRadius: "12px",
-              padding: "16px 20px",
-            }}
-          >
+          <div style={{ marginTop: "28px", backgroundColor: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: "12px", padding: "16px 20px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
               <span style={{ fontSize: "13px", fontWeight: 600, color: "#a3a3a3" }}>Progreso</span>
-              <span style={{ fontSize: "13px", fontWeight: 700, color: "#4ade80" }}>
-                {completedSteps.size} / 4 pasos
-              </span>
+              <span style={{ fontSize: "13px", fontWeight: 700, color: "#4ade80" }}>{completedSteps.size} / 4 pasos</span>
             </div>
             <div style={{ backgroundColor: "#0f0f0f", borderRadius: "4px", height: "6px", overflow: "hidden" }}>
-              <div
-                style={{
-                  height: "100%",
-                  width: `${progress}%`,
-                  backgroundColor: "#4ade80",
-                  borderRadius: "4px",
-                  transition: "width 0.5s ease",
-                  boxShadow: "0 0 8px rgba(74,222,128,0.5)",
-                }}
-              />
+              <div style={{
+                height: "100%", width: `${progress}%`, backgroundColor: "#4ade80",
+                borderRadius: "4px", transition: "width 0.5s ease",
+                boxShadow: "0 0 8px rgba(74,222,128,0.5)",
+              }} />
             </div>
             {progress === 100 && (
               <p style={{ margin: "10px 0 0", fontSize: "13px", color: "#4ade80", fontWeight: 600 }}>
-                ¡Listo! Ahora ve a la Papelera de Google Photos y vacíala para eliminar permanentemente.
+                ¡Listo! Ve a la Papelera de Google Photos y vacíala para eliminar permanentemente.
               </p>
             )}
           </div>
         )}
 
-        {/* ── Warning Banner ─────────────────────────────────────────── */}
-        <div
-          style={{
-            backgroundColor: "#1a0a0a",
-            border: "1px solid rgba(220,38,38,0.4)",
-            borderLeft: "4px solid #dc2626",
-            borderRadius: "12px",
-            padding: "20px 22px",
-            marginTop: "28px",
-            marginBottom: "32px",
-          }}
-        >
+        {/* Warning */}
+        <div style={{
+          backgroundColor: "#1a0a0a", border: "1px solid rgba(220,38,38,0.4)",
+          borderLeft: "4px solid #dc2626", borderRadius: "12px",
+          padding: "20px 22px", marginTop: "28px", marginBottom: "32px",
+        }}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: "14px" }}>
-            <span style={{ color: "#ef4444", flexShrink: 0, marginTop: "1px" }}>
-              <IconAlertTriangle />
-            </span>
+            <span style={{ color: "#ef4444", flexShrink: 0, marginTop: "1px" }}><IconAlertTriangle /></span>
             <div>
               <p style={{ color: "#fca5a5", fontWeight: 700, fontSize: "15px", margin: "0 0 8px" }}>
                 Advertencia: Esta acción es irreversible
               </p>
               <p style={{ color: "#f87171", fontSize: "14px", margin: "0 0 14px", lineHeight: 1.65 }}>
-                Las fotos eliminadas <strong>no se pueden recuperar</strong> una vez vaciada la papelera.
-                Haz una copia de seguridad de todo lo que quieras conservar antes de continuar.
+                Las fotos eliminadas <strong>no se pueden recuperar</strong> una vez vaciada la papelera. Haz una copia de seguridad antes de continuar.
               </p>
-              <a
-                href="https://takeout.google.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  color: "#4ade80",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  textDecoration: "none",
-                  borderBottom: "1px solid rgba(74,222,128,0.3)",
-                  paddingBottom: "1px",
-                }}
-              >
-                Descargar copia de seguridad con Google Takeout
-                <IconExternalLink />
+              <a href="https://takeout.google.com" target="_blank" rel="noopener noreferrer"
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#4ade80", fontSize: "14px", fontWeight: 600, textDecoration: "none", borderBottom: "1px solid rgba(74,222,128,0.3)", paddingBottom: "1px" }}>
+                Descargar copia con Google Takeout <IconExternalLink />
               </a>
             </div>
           </div>
         </div>
 
-        {/* ── Steps header ───────────────────────────────────────────── */}
-        <h2
-          style={{
-            fontSize: "19px",
-            fontWeight: 700,
-            color: "#ffffff",
-            margin: "0 0 24px",
-            letterSpacing: "-0.3px",
-          }}
-        >
+        <h2 style={{ fontSize: "19px", fontWeight: 700, color: "#ffffff", margin: "0 0 24px", letterSpacing: "-0.3px" }}>
           Guía paso a paso
         </h2>
 
-        {/* ── Step 1 ─────────────────────────────────────────────────── */}
+        {/* Step 1 */}
         <StepCard num={1} total={4} title="Abre Google Photos en una nueva pestaña" done={completedSteps.has(1)}>
           <p style={{ color: "#a3a3a3", marginBottom: "18px", lineHeight: 1.65, fontSize: "14px" }}>
-            Haz clic en el botón de abajo para abrir Google Photos. Asegúrate de
-            haber iniciado sesión con tu cuenta de Google.
+            Haz clic en el botón de abajo para abrir Google Photos. Asegúrate de haber iniciado sesión con tu cuenta de Google.
           </p>
-          <a
-            href="https://photos.google.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => markDone(1)}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              backgroundColor: "#4ade80",
-              color: "#0f0f0f",
-              fontWeight: 700,
-              padding: "12px 24px",
-              borderRadius: "9px",
-              textDecoration: "none",
-              fontSize: "15px",
-              transition: "all 0.2s ease",
-              boxShadow: "0 0 16px rgba(74,222,128,0.2)",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.opacity = "0.88";
-              (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 24px rgba(74,222,128,0.4)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.opacity = "1";
-              (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 16px rgba(74,222,128,0.2)";
-            }}
-          >
-            Abrir Google Photos
-            <IconExternalLink />
+          <a href="https://photos.google.com" target="_blank" rel="noopener noreferrer" onClick={() => markDone(1)}
+            style={{ display: "inline-flex", alignItems: "center", gap: "8px", backgroundColor: "#4ade80", color: "#0f0f0f", fontWeight: 700, padding: "12px 24px", borderRadius: "9px", textDecoration: "none", fontSize: "15px", transition: "all 0.2s ease", boxShadow: "0 0 16px rgba(74,222,128,0.2)" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.opacity = "0.88"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.opacity = "1"; }}>
+            Abrir Google Photos <IconExternalLink />
           </a>
         </StepCard>
 
-        {/* ── Step 2 ─────────────────────────────────────────────────── */}
+        {/* Step 2 */}
         <StepCard num={2} total={4} title="Abre la Consola del Navegador" done={completedSteps.has(2)}>
           <p style={{ color: "#a3a3a3", marginBottom: "14px", lineHeight: 1.65, fontSize: "14px" }}>
-            Con Google Photos abierto, abre las herramientas del desarrollador usando
-            el atajo de teclado de tu navegador:
+            Con Google Photos abierto, abre las herramientas del desarrollador:
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
             {[
@@ -757,61 +915,27 @@ export default function App() {
               { browser: "Firefox", icon: "🦊", shortcut: "F12  ·  Ctrl+Shift+K (Win) / Cmd+Option+K (Mac)" },
               { browser: "Safari", icon: "🧭", shortcut: 'Preferencias → Avanzado → "Mostrar menú Desarrollar" → Cmd+Option+C' },
             ].map((item) => (
-              <div
-                key={item.browser}
-                style={{
-                  backgroundColor: "#0f0f0f",
-                  border: "1px solid #252525",
-                  borderRadius: "9px",
-                  padding: "12px 16px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                }}
-              >
+              <div key={item.browser} style={{ backgroundColor: "#0f0f0f", border: "1px solid #252525", borderRadius: "9px", padding: "12px 16px", display: "flex", alignItems: "center", gap: "12px" }}>
                 <span style={{ fontSize: "18px", flexShrink: 0 }}>{item.icon}</span>
                 <div>
-                  <div style={{ color: "#4ade80", fontWeight: 600, fontSize: "13px", marginBottom: "3px" }}>
-                    {item.browser}
-                  </div>
-                  <div style={{ color: "#c9d1d9", fontSize: "13px", fontFamily: "'Menlo','Monaco',monospace" }}>
-                    {item.shortcut}
-                  </div>
+                  <div style={{ color: "#4ade80", fontWeight: 600, fontSize: "13px", marginBottom: "3px" }}>{item.browser}</div>
+                  <div style={{ color: "#c9d1d9", fontSize: "13px", fontFamily: "'Menlo','Monaco',monospace" }}>{item.shortcut}</div>
                 </div>
               </div>
             ))}
           </div>
-          <p style={{ color: "#5a5a5a", fontSize: "13px", lineHeight: 1.55, margin: 0 }}>
-            Ve a la pestaña <strong style={{ color: "#737373" }}>Console</strong> dentro de las herramientas del desarrollador.
+          <p style={{ color: "#5a5a5a", fontSize: "13px", margin: "0 0 14px" }}>
+            Ve a la pestaña <strong style={{ color: "#737373" }}>Console</strong> dentro de las herramientas.
           </p>
-          <button
-            onClick={() => markDone(2)}
-            style={{
-              marginTop: "14px",
-              backgroundColor: "transparent",
-              border: "1px solid #2a2a2a",
-              borderRadius: "7px",
-              padding: "8px 16px",
-              color: "#737373",
-              fontSize: "13px",
-              cursor: "pointer",
-              fontFamily: "Inter, sans-serif",
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "#4ade80";
-              (e.currentTarget as HTMLButtonElement).style.color = "#4ade80";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "#2a2a2a";
-              (e.currentTarget as HTMLButtonElement).style.color = "#737373";
-            }}
-          >
+          <button onClick={() => markDone(2)}
+            style={{ backgroundColor: "transparent", border: "1px solid #2a2a2a", borderRadius: "7px", padding: "8px 16px", color: "#737373", fontSize: "13px", cursor: "pointer", fontFamily: "Inter, sans-serif", transition: "all 0.2s" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#4ade80"; (e.currentTarget as HTMLButtonElement).style.color = "#4ade80"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#2a2a2a"; (e.currentTarget as HTMLButtonElement).style.color = "#737373"; }}>
             ✓ Consola abierta
           </button>
         </StepCard>
 
-        {/* ── Step 3 ─────────────────────────────────────────────────── */}
+        {/* Step 3 */}
         <StepCard num={3} total={4} title="Copia el Script" done={completedSteps.has(3)}>
           <p style={{ color: "#a3a3a3", marginBottom: "16px", lineHeight: 1.65, fontSize: "14px" }}>
             Haz clic en <strong style={{ color: "#4ade80" }}>Copiar Script</strong> para copiar el código al portapapeles:
@@ -819,97 +943,40 @@ export default function App() {
           <CodeBlock code={SCRIPT} onCopied={() => markDone(3)} />
         </StepCard>
 
-        {/* ── Step 4 ─────────────────────────────────────────────────── */}
+        {/* Step 4 */}
         <StepCard num={4} total={4} title="Pega el Script y Presiona Enter" done={completedSteps.has(4)}>
           <p style={{ color: "#a3a3a3", marginBottom: "16px", lineHeight: 1.65, fontSize: "14px" }}>
             En la consola de Google Photos, ejecuta el script:
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
             {[
-              { num: "1", text: 'Haz clic dentro de la consola (donde aparece el símbolo ">").' },
-              { num: "2", text: "Pega con Ctrl+V (Windows/Linux) o Cmd+V (Mac)." },
-              { num: "3", text: "Presiona Enter para ejecutar." },
-              { num: "4", text: "Espera el mensaje de confirmación del script. Puede tardar unos segundos." },
+              { n: "1", text: 'Haz clic dentro de la consola (donde aparece el símbolo ">").' },
+              { n: "2", text: "Pega con Ctrl+V (Windows/Linux) o Cmd+V (Mac)." },
+              { n: "3", text: "Presiona Enter para ejecutar." },
+              { n: "4", text: "Espera el mensaje de confirmación. Puede tardar unos segundos." },
             ].map((item) => (
-              <div
-                key={item.num}
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: "12px",
-                  backgroundColor: "#0f0f0f",
-                  border: "1px solid #252525",
-                  borderRadius: "9px",
-                  padding: "12px 16px",
-                }}
-              >
-                <span
-                  style={{
-                    backgroundColor: "rgba(74,222,128,0.12)",
-                    color: "#4ade80",
-                    fontWeight: 700,
-                    fontSize: "12px",
-                    borderRadius: "5px",
-                    padding: "2px 8px",
-                    flexShrink: 0,
-                    marginTop: "1px",
-                  }}
-                >
-                  {item.num}
-                </span>
-                <span style={{ color: "#d4d4d4", fontSize: "14px", lineHeight: 1.55 }}>
-                  {item.text}
-                </span>
+              <div key={item.n} style={{ display: "flex", alignItems: "flex-start", gap: "12px", backgroundColor: "#0f0f0f", border: "1px solid #252525", borderRadius: "9px", padding: "12px 16px" }}>
+                <span style={{ backgroundColor: "rgba(74,222,128,0.12)", color: "#4ade80", fontWeight: 700, fontSize: "12px", borderRadius: "5px", padding: "2px 8px", flexShrink: 0, marginTop: "1px" }}>{item.n}</span>
+                <span style={{ color: "#d4d4d4", fontSize: "14px", lineHeight: 1.55 }}>{item.text}</span>
               </div>
             ))}
           </div>
-          <button
-            onClick={() => markDone(4)}
-            style={{
-              backgroundColor: "transparent",
-              border: "1px solid #2a2a2a",
-              borderRadius: "7px",
-              padding: "8px 16px",
-              color: "#737373",
-              fontSize: "13px",
-              cursor: "pointer",
-              fontFamily: "Inter, sans-serif",
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "#4ade80";
-              (e.currentTarget as HTMLButtonElement).style.color = "#4ade80";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "#2a2a2a";
-              (e.currentTarget as HTMLButtonElement).style.color = "#737373";
-            }}
-          >
+          <button onClick={() => markDone(4)}
+            style={{ backgroundColor: "transparent", border: "1px solid #2a2a2a", borderRadius: "7px", padding: "8px 16px", color: "#737373", fontSize: "13px", cursor: "pointer", fontFamily: "Inter, sans-serif", transition: "all 0.2s" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#4ade80"; (e.currentTarget as HTMLButtonElement).style.color = "#4ade80"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#2a2a2a"; (e.currentTarget as HTMLButtonElement).style.color = "#737373"; }}>
             ✓ Script ejecutado
           </button>
         </StepCard>
 
-        {/* ── Progress Tips ──────────────────────────────────────────── */}
-        <div
-          style={{
-            backgroundColor: "#0c1320",
-            border: "1px solid rgba(59,130,246,0.25)",
-            borderLeft: "4px solid #3b82f6",
-            borderRadius: "12px",
-            padding: "20px 22px",
-            marginTop: "32px",
-          }}
-        >
+        {/* Tips */}
+        <div style={{ backgroundColor: "#0c1320", border: "1px solid rgba(59,130,246,0.25)", borderLeft: "4px solid #3b82f6", borderRadius: "12px", padding: "20px 22px", marginTop: "32px" }}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: "13px" }}>
-            <span style={{ color: "#3b82f6", flexShrink: 0, marginTop: "1px" }}>
-              <IconInfo />
-            </span>
+            <span style={{ color: "#3b82f6", flexShrink: 0, marginTop: "1px" }}><IconInfo /></span>
             <div>
-              <p style={{ color: "#93c5fd", fontWeight: 700, fontSize: "15px", margin: "0 0 12px" }}>
-                Cómo funciona el proceso
-              </p>
+              <p style={{ color: "#93c5fd", fontWeight: 700, fontSize: "15px", margin: "0 0 12px" }}>Cómo funciona el proceso</p>
               <ul style={{ color: "#7ea8c9", fontSize: "14px", lineHeight: 1.75, margin: 0, paddingLeft: "18px", display: "flex", flexDirection: "column", gap: "4px" }}>
-                <li>El script mueve tus fotos a la papelera en <strong style={{ color: "#93c5fd" }}>lotes</strong>, no todas de una vez.</li>
+                <li>El script mueve tus fotos a la papelera en <strong style={{ color: "#93c5fd" }}>lotes</strong>, no todas a la vez.</li>
                 <li>Debes <strong style={{ color: "#93c5fd" }}>recargar Google Photos (F5)</strong> y volver a ejecutar el script para procesar el siguiente lote.</li>
                 <li>Repite hasta que no queden más fotos en la vista principal.</li>
                 <li>Finalmente, ve a <strong style={{ color: "#93c5fd" }}>Papelera → Vaciar papelera</strong> para eliminar permanentemente.</li>
@@ -919,69 +986,49 @@ export default function App() {
           </div>
         </div>
 
-        {/* ── FAQ ───────────────────────────────────────────────────── */}
+        {/* FAQ */}
         <div style={{ marginTop: "44px" }}>
-          <h2
-            style={{
-              fontSize: "19px",
-              fontWeight: 700,
-              color: "#ffffff",
-              margin: "0 0 4px",
-              letterSpacing: "-0.3px",
-            }}
-          >
-            Preguntas frecuentes
-          </h2>
-          <p style={{ color: "#5a5a5a", fontSize: "14px", margin: "0 0 20px" }}>
-            Dudas habituales sobre el proceso de limpieza
-          </p>
-          <div
-            style={{
-              backgroundColor: "#1a1a1a",
-              border: "1px solid #2a2a2a",
-              borderRadius: "12px",
-              padding: "0 24px",
-            }}
-          >
-            {faqs.map((faq) => (
-              <FAQItem key={faq.q} q={faq.q} a={faq.a} />
-            ))}
+          <h2 style={{ fontSize: "19px", fontWeight: 700, color: "#ffffff", margin: "0 0 4px", letterSpacing: "-0.3px" }}>Preguntas frecuentes</h2>
+          <p style={{ color: "#5a5a5a", fontSize: "14px", margin: "0 0 20px" }}>Dudas habituales sobre el proceso</p>
+          <div style={{ backgroundColor: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: "12px", padding: "0 24px" }}>
+            {faqs.map((faq) => <FAQItem key={faq.q} q={faq.q} a={faq.a} />)}
           </div>
         </div>
 
-        {/* ── Footer ────────────────────────────────────────────────── */}
-        <footer
-          style={{
-            textAlign: "center",
-            marginTop: "52px",
-            paddingTop: "28px",
-            borderTop: "1px solid #1e1e1e",
-          }}
-        >
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              backgroundColor: "#141414",
-              border: "1px solid #252525",
-              borderRadius: "24px",
-              padding: "10px 20px",
-              marginBottom: "16px",
-            }}
-          >
+        {/* Footer */}
+        <footer style={{ textAlign: "center", marginTop: "52px", paddingTop: "28px", borderTop: "1px solid #1e1e1e" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", backgroundColor: "#141414", border: "1px solid #252525", borderRadius: "24px", padding: "10px 20px", marginBottom: "14px" }}>
             <span style={{ color: "#4ade80" }}><IconShield /></span>
             <p style={{ color: "#5a5a5a", fontSize: "13px", margin: 0 }}>
-              Esta herramienta funciona{" "}
-              <strong style={{ color: "#737373" }}>completamente en tu navegador</strong>.
-              No se envían fotos ni datos a ningún servidor.
+              Esta herramienta funciona <strong style={{ color: "#737373" }}>completamente en tu navegador</strong>. No se envían fotos ni datos a ningún servidor.
             </p>
           </div>
-          <p style={{ color: "#3a3a3a", fontSize: "12px", margin: 0 }}>
+          <p style={{ color: "#3a3a3a", fontSize: "12px" }}>
             Usa esta herramienta bajo tu propia responsabilidad. Haz siempre una copia de seguridad primero.
           </p>
         </footer>
       </div>
     </div>
   );
+}
+
+// ─── Root App ─────────────────────────────────────────────────────────────────
+
+export default function App() {
+  const [view, setView] = useState<"landing" | "tool">("landing");
+
+  const enterTool = () => {
+    setTimeout(() => {
+      setView("tool");
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }, 530);
+  };
+
+  const goBack = () => {
+    setView("landing");
+    window.scrollTo({ top: 0, behavior: "instant" });
+  };
+
+  if (view === "tool") return <ToolPage onBack={goBack} />;
+  return <LandingPage onEnter={enterTool} />;
 }
